@@ -4,5 +4,4 @@ A radio tracker built in a few hours from an Arduino, an EM-406a GPS and a Radio
 
 Used for tracking high altitude balloons during flight.  
 
-By Adam Greig and Jon Sowman for CUSF - 2010.  
-[http://www.cuspaceflight.co.uk]  
+By [Adam Greig](http://github.com/randomskk) and [Jon Sowman](http://github.com/jonsowman) for [CUSF](http://www.cuspaceflight.co.uk) - 2010.  
