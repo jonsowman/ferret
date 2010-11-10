@@ -2,6 +2,11 @@
   TinyGPS - a small GPS library for Arduino providing basic NMEA parsing
   Copyright (C) 2008-9 Mikal Hart
   All rights reserved.
+  
+  9/8/2010	Modified by Terry Baume (terry@bogaurd.net)
+			Support for Ublox NMEA extension PUBX 00
+			Method to retrieve number of sats tracked
+			Adjusted invalid lock defaults
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -56,7 +61,12 @@ class TinyGPS
         GPS_INVALID_AGE : millis() - _last_time_fix;
     }
 
-    // signed altitude in centimeters (from GPGGA sentence)
+    // terry
+	// number of sats in use
+	inline int sats() { return _sats; }
+	//
+	
+	// signed altitude in centimeters (from GPGGA sentence)
     inline long altitude() { return _altitude; }
 
     // course in last full GPRMC sentence in 100th of a degree
@@ -64,7 +74,7 @@ class TinyGPS
     
     // speed in last full GPRMC sentence in 100ths of a knot
     unsigned long speed() { return _speed; }
-
+	
 #ifndef _GPS_NO_STATS
     void stats(unsigned long *chars, unsigned short *good_sentences, unsigned short *failed_cs);
 #endif
@@ -101,16 +111,14 @@ class TinyGPS
     inline float f_speed_mph()   { return _GPS_MPH_PER_KNOT * f_speed_knots(); }
     inline float f_speed_mps()   { return _GPS_MPS_PER_KNOT * f_speed_knots(); }
     inline float f_speed_kmph()  { return _GPS_KMPH_PER_KNOT * f_speed_knots(); }
-	
-	inline long num_sats() {return _num_sats;}
 
     static int library_version() { return _GPS_VERSION; }
 
-    enum {GPS_INVALID_AGE = 0xFFFFFFFF, GPS_INVALID_ANGLE = 999999999, GPS_INVALID_ALTITUDE = 999999999, GPS_INVALID_DATE = 0,
-      GPS_INVALID_TIME = 0xFFFFFFFF, GPS_INVALID_SPEED = 999999999, GPS_INVALID_FIX_TIME = 0xFFFFFFFF, GPS_INVALID_SATS = 99};
+    enum {GPS_INVALID_AGE = 0xFFFFFFFF, GPS_INVALID_ANGLE = 999999999, GPS_INVALID_ALTITUDE = 0, GPS_INVALID_DATE = 0,
+      GPS_INVALID_TIME = 0xFFFFFFFF, GPS_INVALID_SPEED = 0, GPS_INVALID_FIX_TIME = 0xFFFFFFFF, GPS_INVALID_SATS = 0}; // terry
 
 private:
-    enum {_GPS_SENTENCE_GPGGA, _GPS_SENTENCE_GPRMC, _GPS_SENTENCE_OTHER};
+    enum {_GPS_SENTENCE_GPGGA, _GPS_SENTENCE_GPRMC, _GPS_SENTENCE_OTHER, _GPS_SENTENCE_PUBX}; // terry
     
     // properties
     unsigned long _time, _new_time;
@@ -120,13 +128,10 @@ private:
     long _altitude, _new_altitude;
     unsigned long  _speed, _new_speed;
     unsigned long  _course, _new_course;
+	int _sats, _new_sats; // terry
 
     unsigned long _last_time_fix, _new_time_fix;
     unsigned long _last_position_fix, _new_position_fix;
-	
-	//NEW
-	unsigned long _num_sats;
-	//
 
     // parsing state variables
     byte _parity;
@@ -136,6 +141,7 @@ private:
     byte _term_number;
     byte _term_offset;
     bool _gps_data_good;
+	int _term_id; // terry
 
 #ifndef _GPS_NO_STATS
     // statistics

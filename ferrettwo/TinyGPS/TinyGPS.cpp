@@ -2,6 +2,11 @@
   TinyGPS - a small GPS library for Arduino providing basic NMEA parsing
   Copyright (C) 2008-9 Mikal Hart
   All rights reserved.
+     
+  9/8/2010	Modified by Terry Baume (terry@bogaurd.net)
+			Support for Ublox NMEA extension PUBX 00
+			Method to retrieve number of sats tracked
+			Adjusted invalid lock defaults
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,9 +24,11 @@
 */
 
 #include "WProgram.h"
-#include "TinyGPS_2.h"
+#include "TinyGPS.h"
 
+#define _GPRMC_TERM   "GPRMC"
 #define _GPGGA_TERM   "GPGGA"
+#define _PUBX_TERM   "PUBX" // terry
 
 TinyGPS::TinyGPS()
 :  _time(GPS_INVALID_TIME)
@@ -39,13 +46,12 @@ TinyGPS::TinyGPS()
 ,  _term_number(0)
 ,  _term_offset(0)
 ,  _gps_data_good(false)
+,  _sats(GPS_INVALID_SATS) // terry
+,  _term_id(0) // terry
 #ifndef _GPS_NO_STATS
 ,  _encoded_characters(0)
 ,  _good_sentences(0)
 ,  _failed_checksum(0)
-//
-,  _num_sats(GPS_INVALID_SATS)
-//
 #endif
 {
   _term[0] = '\0';
@@ -173,12 +179,32 @@ bool TinyGPS::term_complete()
 
         switch(_sentence_type)
         {
+        case _GPS_SENTENCE_GPRMC:
+          _time      = _new_time;
+          _date      = _new_date;
+          _latitude  = _new_latitude;
+          _longitude = _new_longitude;
+          _speed     = _new_speed;
+          _course    = _new_course;
+          break;
         case _GPS_SENTENCE_GPGGA:
           _altitude  = _new_altitude;
           _time      = _new_time;
           _latitude  = _new_latitude;
           _longitude = _new_longitude;
           break;
+		
+		// terry
+		case _GPS_SENTENCE_PUBX:
+          _time      = _new_time;
+          _latitude  = _new_latitude;
+          _longitude = _new_longitude;
+          _speed     = _new_speed;
+          _course    = _new_course;
+		  _altitude  = _new_altitude;
+		  _sats		 = _new_sats;
+          break;
+		//
         }
 
         return true;
@@ -195,18 +221,43 @@ bool TinyGPS::term_complete()
   // the first term determines the sentence type
   if (_term_number == 0)
   {
-	if (!gpsstrcmp(_term, _GPGGA_TERM))
+    if (!gpsstrcmp(_term, _GPRMC_TERM))
+      _sentence_type = _GPS_SENTENCE_GPRMC;
+    else if (!gpsstrcmp(_term, _GPGGA_TERM))
       _sentence_type = _GPS_SENTENCE_GPGGA;
+	// terry
+	else if (!gpsstrcmp(_term, _PUBX_TERM))
+      _sentence_type = _GPS_SENTENCE_PUBX;
+	//
     else
       _sentence_type = _GPS_SENTENCE_OTHER;
     return false;
   }
 
   if (_sentence_type != _GPS_SENTENCE_OTHER && _term[0])
-  switch((_sentence_type == _GPS_SENTENCE_GPGGA ? 200 : 100) + _term_number)
+  
+  // terry
+  switch(_sentence_type) {
+	
+	case _GPS_SENTENCE_GPRMC:
+		_term_id = 100 + _term_number;
+		break;
+	
+	case _GPS_SENTENCE_GPGGA:
+		_term_id = 200 + _term_number;
+		break;
+		
+	case _GPS_SENTENCE_PUBX:
+		_term_id = 300 + _term_number;
+		break;
+  }
+  //
+  
+  switch(_term_id) // terry
   {
     case 101: // Time in both sentences
     case 201:
+	case 302: // terry (time PUBX 00)
       _new_time = parse_decimal();
       _new_time_fix = millis();
       break;
@@ -215,20 +266,24 @@ bool TinyGPS::term_complete()
       break;
     case 103: // Latitude
     case 202:
+	case 303: // terry (lat PUBX 00)
       _new_latitude = parse_degrees();
       _new_position_fix = millis();
       break;
     case 104: // N/S
     case 203:
+	case 304: // terry (N/S PUBX 00)
       if (_term[0] == 'S')
         _new_latitude = -_new_latitude;
       break;
     case 105: // Longitude
     case 204:
+	case 305: // terry (lon PUBX 00)
       _new_longitude = parse_degrees();
       break;
     case 106: // E/W
     case 205:
+	case 306: // terry (E/W PUBX 00)
       if (_term[0] == 'W')
         _new_longitude = -_new_longitude;
       break;
@@ -236,6 +291,7 @@ bool TinyGPS::term_complete()
       _new_speed = parse_decimal();
       break;
     case 108: // Course (GPRMC)
+	case 312: // terry (course PUBX 00)
       _new_course = parse_decimal();
       break;
     case 109: // Date (GPRMC)
@@ -244,12 +300,22 @@ bool TinyGPS::term_complete()
     case 206: // Fix data (GPGGA)
       _gps_data_good = _term[0] > '0';
       break;
-    case 207: // No of Sats (GPGGA)
-      _num_sats = gpsatol(_term);
-      break;
     case 209: // Altitude (GPGGA)
+	case 307: // terry (altitude PUBX 00)
       _new_altitude = parse_decimal();
       break;
+	  
+	// terry
+	case 301: // PUBX message ID (we want 0)
+	  if (_term[0] == '0' && _term[1] == '0') _gps_data_good = 1;
+	  break;
+	case 311: // (km/h speed PUBX 00)
+	  _new_speed = parse_decimal() / _GPS_KMPH_PER_KNOT;
+	  break;
+	case 318: // sats
+	  _new_sats = atoi(_term);
+	  break;
+	//
   }
 
   return false;
