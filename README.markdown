@@ -15,17 +15,17 @@ Ferret Two
 
 A less hacky version using the TinyGPS Arduino library for talking to the GPS device, and using an FSA-03 GPS (uBlox 5 chipset).  
 
-Credit to [James Coxon](http://github.com/jamescoxon) for his modified version of the TinyGPS library, to enable reporting satellite count.  
+We use a [modified version of the TinyGPS library](http://ukhas.org.uk/_media/code:tinygps.zip?id=guides%3Afalcom_fsa03&cache=cache) that enables reporting number of satellites.
 
 librtty
 -------
 
 This project also includes librtty, an Arduino library for generating an RTTY bitstream to be fed into an FM transmitter. Uses a potential divider on the Arduino output pin, providing the correct voltages to set the frequency shift.  
 
-**Usage as follows**: call this line before setup()
+**Usage as follows**: call this line before setup():  
 `RTTY rtty(radio_txd_pin, baud_rate, stop_bits)`  
 
-Then call the `transmit()` function with the string you wish to send:  
+Then call the `transmit()` function with the string you wish to send, forex:  
 `rtty.transmit("This is my string\r\n")`  
 
 Please see the schematic in the `ferrettwo/` directory for details of how the hardware needs to be set up to make use of librtty.  
