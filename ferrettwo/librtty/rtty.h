@@ -17,12 +17,12 @@ class RTTY {
     void writeByte(char data);
   private:
     int getLowVal(int highval, int shift);
-    int _pin;
-    int _highval;
+    const int _pin;
+    const int _highval;
     int _lowval;
-    int _shift;
-    float _stopbits;
-    int _baud;
+    const int _shift;
+    const float _stopbits;
+    const int _baud;
 };
 
 #endif

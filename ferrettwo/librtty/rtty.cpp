@@ -9,15 +9,12 @@
 #include "rtty.h"
 
 
-RTTY::RTTY(int pin, int baud, int shift, float stopbits) {
+RTTY::RTTY(int pin, int baud, int shift, float stopbits)
+    : _pin(pin), _highval(120), _baud(baud), _shift(shift), _stopbits(stopbits)
+{
     // Constructor function sets the radio TXD to output
     // and sets the PWM timer to 64 kHz for pins 5 and 6
-    _pin = pin;
-    _highval = 120;
     _lowval = getLowVal(_highval, shift);
-    _shift = shift;
-    _stopbits = stopbits;
-    _baud = baud;
     pinMode(pin, OUTPUT);
 
 }
@@ -44,18 +41,17 @@ void RTTY::transmit(char *str) {
 void RTTY::writeByte(char data) {
     // Write a single byte to the radio ensuring it is padded
     // by the correct number of start/stop bits
-    byte mask;
-    int timestep;
-
-    timestep = (int)(62500/_baud);
+    
+    int timestep = (int)(62500/_baud);
 
     // Write the start bit
     analogWrite(_pin, _lowval);
     delay(timestep);
 
     // Write the data byte
-    for (mask = 0x01; mask <=(1<<6); mask <<= 1) {
-        if ( data & mask ) {
+    int bit;
+    for ( bit=0; bit<7; bit++ ) {
+        if ( data & (1<<bit) ) {
             analogWrite(_pin, _highval);
         } else {
             analogWrite(_pin, _lowval);
