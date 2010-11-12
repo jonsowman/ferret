@@ -12,15 +12,11 @@
 
 class RTTY {
   public:
-    RTTY(int pin, int baud, int shift, float stopbits);
+    RTTY(int pin, int baud, float stopbits);
     void transmit(char *str);
-    void writeByte(char data);
   private:
-    int getLowVal(int highval, int shift);
+    void _writeByte(char data);
     const int _pin;
-    const int _highval;
-    int _lowval;
-    const int _shift;
     const float _stopbits;
     const int _baud;
 };
