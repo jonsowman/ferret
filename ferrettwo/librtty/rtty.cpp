@@ -20,17 +20,25 @@ RTTY::RTTY(int pin, int baud, int shift, float stopbits) {
     _baud = baud;
     pinMode(pin, OUTPUT);
 
-    // Set the PWM frequency to 62.5 kHz
-    TCCR0B = TCCR0B & 0b11111000 | 0x01;
 }
 
 void RTTY::transmit(char *str) {
+    // Set the PWM frequency to 62.5 kHz
+    TCCR0B = TCCR0B & 0b11111000 | 0x01;
+
+    // Small delay to let the new frequency settle or something
+    delay(1000);
+
     // Transmit an input string over the radio
     int j=0;
 
     while(str[j] != 0) {
         writeByte(str[j]);
+        j++;
     }
+
+    // Set the PWM frequency to 1 kHz
+    TCCR0B = TCCR0B & 0b11111000 | 0x03;
 }
 
 void RTTY::writeByte(char data) {
@@ -39,7 +47,7 @@ void RTTY::writeByte(char data) {
     byte mask;
     int timestep;
 
-    timestep = (int)62500/_baud;
+    timestep = (int)(62500/_baud);
 
     // Write the start bit
     analogWrite(_pin, _lowval);
