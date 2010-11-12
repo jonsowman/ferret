@@ -1,7 +1,7 @@
 #include <rtty.h>
 
-// Pin, baud, shift, stopbits
-RTTY rtty(6, 50, 350, 1.5);
+// Pin, baud, stopbits
+RTTY rtty(6, 50, 1.5);
 
 void setup() {
   // do nothing
