@@ -20,10 +20,10 @@ We use a [modified version of the TinyGPS library](http://ukhas.org.uk/_media/co
 librtty
 -------
 
-This project also includes librtty, an Arduino library for generating an RTTY bitstream to be fed into an FM transmitter. Uses a potential divider on the Arduino output pin, providing the correct voltages to set the frequency shift.  
+This project also includes librtty [/ˈlɪbərti/], an Arduino library for generating an RTTY bitstream to be fed into an FM transmitter. Uses a potential divider on the Arduino output pin, providing the correct voltages to set the frequency shift.  
 
 **Usage as follows**: call this line before setup():  
-`RTTY rtty(radio_txd_pin, baud_rate, stop_bits)`  
+`RTTY rtty(radio_txd_pin, baud_rate, stop_bits, CHECKSUM_CRC16)`  
 
 Then call the `transmit()` function with the string you wish to send, forex:  
 `rtty.transmit("This is my string\r\n")`  
