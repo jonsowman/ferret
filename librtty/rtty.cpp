@@ -7,10 +7,11 @@
 
 #include "WProgram.h"
 #include "util/crc16.h"
+#include "types.h"
 #include "rtty.h"
 
-RTTY::RTTY(int pin, int baud, float stopbits)
-    : _pin(pin), _baud(baud), _stopbits(stopbits)
+RTTY::RTTY(int pin, int baud, float stopbits, checksum_type ctype)
+    : _pin(pin), _baud(baud), _stopbits(stopbits), _ctype(ctype)
 {
     // Set the radio TXD pin to output
     pinMode(pin, OUTPUT);
@@ -68,11 +69,23 @@ unsigned int RTTY::crc16(char *string) {
     unsigned int i;
     unsigned int crc;
 
+    // CCITT uses 0xFFFF as the initial CRC value
     crc = 0xFFFF;
 
+    // Iterate through the string updating the checksum byte-by-byte
     for( i=0; i < strlen(string); i++ ) {
         crc = _crc_xmodem_update(crc, (uint8_t)(string[i]));
     }
 
     return crc;
 }
+
+void RTTY::setBaud(int newbaud) {
+    _baud = newbaud;
+}
+
+void RTTY::setChecksum(checksum_type ctype) {
+    _ctype = ctype;
+}
+
+
