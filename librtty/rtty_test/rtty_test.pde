@@ -4,7 +4,8 @@
 RTTY rtty(6, 50, 1.5, CHECKSUM_CRC16);
 
 void setup() {
-  // do nothing
+  rtty.setBaud(50);
+  rtty.setChecksum(CHECKSUM_NONE);
 }
 
 void loop() {
