@@ -14,6 +14,7 @@ class RTTY {
   public:
     RTTY(int pin, int baud, float stopbits);
     void transmit(char *str);
+    unsigned int crc16(char *string);
   private:
     void _writeByte(char data);
     const int _pin;

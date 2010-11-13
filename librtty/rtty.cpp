@@ -6,6 +6,7 @@
 */
 
 #include "WProgram.h"
+#include "util/crc16.h"
 #include "rtty.h"
 
 RTTY::RTTY(int pin, int baud, float stopbits)
@@ -59,4 +60,19 @@ void RTTY::_writeByte(char data) {
     digitalWrite(_pin, HIGH);
     delayMicroseconds((int)(timestep * _stopbits));
     delayMicroseconds((int)(timestep * _stopbits));
+}
+
+unsigned int RTTY::crc16(char *string) {
+    // Returns the CRC16_CCITT checksum for the input string
+
+    unsigned int i;
+    unsigned int crc;
+
+    crc = 0xFFFF;
+
+    for( i=0; i < strlen(string); i++ ) {
+        crc = _crc_xmodem_update(crc, (uint8_t)(string[i]));
+    }
+
+    return crc;
 }
