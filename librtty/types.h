@@ -1,5 +1,5 @@
 /*
-  rtty.h
+  types.h
   A library for outputting RTTY signals
   
   CU Spaceflight 2010

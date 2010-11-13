@@ -20,24 +20,28 @@ RTTY::RTTY(int pin, int baud, float stopbits, checksum_type ctype)
 void RTTY::transmit(char *str) {
     // Transmit an input string over the radio
     int j=0;
-
-    // Iterate through the string transmitting byte-by-byte
-    while(str[j] != 0) {
-        _writeByte(str[j]);
-        j++;
-    }
-}
-
-void RTTY::_writeByte(char data) {
-    // Write a single byte to the radio ensuring it is padded
-    // by the correct number of start/stop bits
     
     // Calculate the timestep in microseconds
     // We use two smaller delays instead of one larger as delayMicroseconds
     // is not accurate above ~16000uS, and the required delay is 20000uS
     // for 50 baud operation
+    //
+    // We calculate the timestep here so that changing the baudrate with
+    // setBaud() during transmission of a string doesn't break things
+    //
     int timestep = (int)(500000/_baud);
 
+    // Iterate through the string transmitting byte-by-byte
+    while(str[j] != 0) {
+        _writeByte(str[j], timestep);
+        j++;
+    }
+}
+
+void RTTY::_writeByte(char data, int timestep) {
+    // Write a single byte to the radio ensuring it is padded
+    // by the correct number of start/stop bits
+    
     // Write the start bit
     digitalWrite(_pin, LOW);
 
@@ -81,10 +85,12 @@ unsigned int RTTY::crc16(char *string) {
 }
 
 void RTTY::setBaud(int newbaud) {
+    // Set the RTTY baud rate to a new one, can be called at any time
     _baud = newbaud;
 }
 
 void RTTY::setChecksum(checksum_type ctype) {
+    // Change the checksum type appended to the transmit string
     _ctype = ctype;
 }
 

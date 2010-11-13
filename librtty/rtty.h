@@ -19,7 +19,7 @@ class RTTY {
     void setBaud(int baud);
     void setChecksum(checksum_type ctype);
   private:
-    void _writeByte(char data);
+    void _writeByte(char data, int timestep);
     const int _pin;
     const float _stopbits;
     int _baud;
