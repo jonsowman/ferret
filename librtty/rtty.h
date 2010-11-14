@@ -15,11 +15,11 @@ class RTTY {
   public:
     RTTY(int pin, int baud, float stopbits, checksum_type ctype);
     void transmit(char *str);
-    unsigned int crc16(char *string);
     void setBaud(int baud);
     void setChecksum(checksum_type ctype);
   private:
     void _writeByte(char data, int timestep);
+    unsigned int _crc16(char *string);
     const int _pin;
     const float _stopbits;
     int _baud;

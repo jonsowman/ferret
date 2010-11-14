@@ -20,6 +20,25 @@ RTTY::RTTY(int pin, int baud, float stopbits, checksum_type ctype)
 void RTTY::transmit(char *str) {
     // Transmit an input string over the radio
     int j=0;
+    unsigned int checksum;
+    char checksum_string[6];
+
+    // First we calculate a checksum if required and append it to the
+    // transmit string if so
+    switch(_ctype) {
+        case CHECKSUM_CRC16:
+            checksum = _crc16(str);
+            sprintf(checksum_string, "*%04X", checksum);
+            strcat(str, checksum_string);
+            break;
+        case CHECKSUM_NONE:
+            break;
+        default:
+            break;
+    }
+
+    // Then we automatically append a newline
+    strcat(str, "\n");
     
     // Calculate the timestep in microseconds
     // We use two smaller delays instead of one larger as delayMicroseconds
@@ -67,7 +86,7 @@ void RTTY::_writeByte(char data, int timestep) {
     delayMicroseconds((int)(timestep * _stopbits));
 }
 
-unsigned int RTTY::crc16(char *string) {
+unsigned int RTTY::_crc16(char *string) {
     // Returns the CRC16_CCITT checksum for the input string
 
     unsigned int i;
