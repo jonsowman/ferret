@@ -14,7 +14,8 @@ RTTY::RTTY(int pin, int baud, float stopbits, checksum_type ctype)
     : _pin(pin), _baud(baud), _stopbits(stopbits), _ctype(ctype)
 {
     // Set the radio TXD pin to output
-    pinMode(pin, OUTPUT);
+    pinMode(_pin, OUTPUT);
+    _timestep = (int)(500000/_baud);
 }
 
 void RTTY::transmit(char *str) {
@@ -44,20 +45,15 @@ void RTTY::transmit(char *str) {
     // We use two smaller delays instead of one larger as delayMicroseconds
     // is not accurate above ~16000uS, and the required delay is 20000uS
     // for 50 baud operation
-    //
-    // We calculate the timestep here so that changing the baudrate with
-    // setBaud() during transmission of a string doesn't break things
-    //
-    int timestep = (int)(500000/_baud);
 
     // Iterate through the string transmitting byte-by-byte
     while(str[j] != 0) {
-        _writeByte(str[j], timestep);
+        _writeByte(str[j]);
         j++;
     }
 }
 
-void RTTY::_writeByte(char data, int timestep) {
+void RTTY::_writeByte(char data) {
     // Write a single byte to the radio ensuring it is padded
     // by the correct number of start/stop bits
     
@@ -65,8 +61,8 @@ void RTTY::_writeByte(char data, int timestep) {
     digitalWrite(_pin, LOW);
 
     // We use delayMicroseconds as it is unaffected by Timer0, unlike delay()
-    delayMicroseconds(timestep);
-    delayMicroseconds(timestep);
+    delayMicroseconds(_timestep);
+    delayMicroseconds(_timestep);
 
     // Write the data byte
     int bit;
@@ -76,14 +72,14 @@ void RTTY::_writeByte(char data, int timestep) {
         } else {
             digitalWrite(_pin, LOW);
         }
-        delayMicroseconds(timestep);
-        delayMicroseconds(timestep);
+        delayMicroseconds(_timestep);
+        delayMicroseconds(_timestep);
     }
 
     // Write the stop bit(s)
     digitalWrite(_pin, HIGH);
-    delayMicroseconds((int)(timestep * _stopbits));
-    delayMicroseconds((int)(timestep * _stopbits));
+    delayMicroseconds((int)(_timestep * _stopbits));
+    delayMicroseconds((int)(_timestep * _stopbits));
 }
 
 unsigned int RTTY::_crc16(char *string) {
@@ -106,6 +102,8 @@ unsigned int RTTY::_crc16(char *string) {
 void RTTY::setBaud(int newbaud) {
     // Set the RTTY baud rate to a new one, can be called at any time
     _baud = newbaud;
+    // Calculate the new timestep
+    _timestep = (int)(500000/newbaud);
 }
 
 void RTTY::setChecksum(checksum_type ctype) {

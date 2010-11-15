@@ -18,11 +18,12 @@ class RTTY {
     void setBaud(int baud);
     void setChecksum(checksum_type ctype);
   private:
-    void _writeByte(char data, int timestep);
+    void _writeByte(char data);
     unsigned int _crc16(char *string);
     const int _pin;
     const float _stopbits;
     int _baud;
+    int _timestep;
     checksum_type _ctype;
 };
 
