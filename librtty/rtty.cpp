@@ -11,21 +11,22 @@
 #include "rtty.h"
 
 RTTY::RTTY(int pin, int baud, float stopbits, checksum_type ctype)
-    : _pin(pin), _baud(baud), _stopbits(stopbits), _ctype(ctype)
+    : _pin(pin), _stopbits(stopbits), _ctype(ctype)
 {
     // Set the radio TXD pin to output
     pinMode(_pin, OUTPUT);
-    _timestep = (int)(500000/_baud);
+    _timestep = (int)(500000/baud);
 }
 
 void RTTY::transmit(char *str) {
-    // Transmit an input string over the radio
-    int j=0;
-    unsigned int checksum;
-    char checksum_string[6];
+    // Transmit an input string over the radio after appending a checksum
+    // if required
 
     // First we calculate a checksum if required and append it to the
     // transmit string if so
+    unsigned int checksum;
+    char checksum_string[6];
+
     switch(_ctype) {
         case CHECKSUM_CRC16:
             checksum = _crc16(str);
@@ -47,6 +48,7 @@ void RTTY::transmit(char *str) {
     // for 50 baud operation
 
     // Iterate through the string transmitting byte-by-byte
+    int j=0;
     while(str[j] != 0) {
         _writeByte(str[j]);
         j++;
@@ -99,16 +101,27 @@ unsigned int RTTY::_crc16(char *string) {
     return crc;
 }
 
-void RTTY::setBaud(int newbaud) {
+void RTTY::setBaud(int baud) {
     // Set the RTTY baud rate to a new one, can be called at any time
-    _baud = newbaud;
     // Calculate the new timestep
-    _timestep = (int)(500000/newbaud);
+    _timestep = (int)(500000/baud);
+}
+
+int RTTY::getBaud() {
+    // Return the current baud rate
+    // We only store the timestep, so re-calculate the baud rate & return
+    int baud = (int)(500000/_timestep);
+    return baud;
 }
 
 void RTTY::setChecksum(checksum_type ctype) {
     // Change the checksum type appended to the transmit string
     _ctype = ctype;
+}
+
+checksum_type RTTY::getChecksum() {
+    // Return the current checksum setting
+    return _ctype;
 }
 
 
