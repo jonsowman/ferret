@@ -87,8 +87,8 @@ class TinyGPS
       *longitude = lon / 100000.0;
     }
 
-    inline void crack_datetime(int *year, byte *month, byte *day, 
-      byte *hour, byte *minute, byte *second, byte *hundredths = 0, unsigned long *fix_age = 0)
+    inline void crack_datetime(int *year, int *month, int *day, 
+      int *hour, int *minute, int *second, int *hundredths = 0, unsigned long *fix_age = 0)
     {
       unsigned long date, time;
       get_datetime(&date, &time, fix_age);
