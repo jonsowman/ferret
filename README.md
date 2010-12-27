@@ -3,6 +3,8 @@ CU Spaceflight Ferret tracker
 
 A simple Arduino based high altitude balloon tracker using a GPS and a Radiometrix NTX2 narrowband FM transmitter module.  
 
+Ferret and librtty are released under the terms of the GNU General Public License. They are distributed in the hope that they will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose.  
+
 Ferret One
 ---------
 
