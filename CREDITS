@@ -1,6 +1,6 @@
 /*
-   types.h
-   Copyright Jon Sowman 2010
+   [ filename ]
+   Copyright [ name ]
 
    This file is part of the Ferret/librtty project, an Arduino based high altitude balloon tracker library for outputting RTTY signals
 
@@ -8,12 +8,3 @@
    http://www.cuspaceflight.co.uk
 */
 
-#ifndef types_h
-#define types_h
-
-enum checksum_type {
-    CHECKSUM_NONE,
-    CHECKSUM_CRC16
-};
-
-#endif
