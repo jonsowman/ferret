@@ -30,6 +30,22 @@ This project also includes librtty [/ˈlɪbərti/], an Arduino library for gener
 Then call the `transmit()` function with the string you wish to send, forex:  
 `rtty.transmit("This is my string\r\n")`  
 
+**Library Functions**:  
+Transmit a string:  
+`transmit(string);`  
+
+Set the transmission baud rate:  
+`setBaud(50);`  
+
+Get the current baud rate setting:  
+`getBaud();`  
+
+Set the checksum type to be appended to the transmitted string:  
+`setChecksum(CHECKSUM_CRC16);`  
+
+Get the current checksum setting:  
+`getChecksum();`  
+
 Please see the schematic in the `ferrettwo/` directory for details of how the hardware needs to be set up to make use of librtty.  
 
 By [Adam Greig](http://github.com/randomskk) and [Jon Sowman](http://github.com/jonsowman) for [CU Spaceflight](http://www.cuspaceflight.co.uk) - 2010.  
