@@ -17,7 +17,7 @@ Ferret Two
 
 A less hacky version using the TinyGPS Arduino library for talking to the GPS device, and using an FSA-03 GPS (uBlox 5 chipset).  
 
-We use a [modified version of the TinyGPS library](http://ukhas.org.uk/_media/code:tinygps.zip?id=guides%3Afalcom_fsa03&cache=cache) that enables reporting number of satellites.
+We use a [modified version of the TinyGPS library](https://github.com/downloads/jonsowman/ferret/tinygps.tgz) that enables reporting number of satellites.
 
 librtty
 -------
