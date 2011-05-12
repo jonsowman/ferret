@@ -19,33 +19,6 @@ A less hacky version using the TinyGPS Arduino library for talking to the GPS de
 
 We use a [modified version of the TinyGPS library](https://github.com/downloads/jonsowman/ferret/tinygps.tgz) that enables reporting number of satellites.
 
-librtty
--------
-
-This project also includes librtty [/ˈlɪbərti/], an Arduino library for generating an RTTY bitstream to be fed into an FM transmitter. Uses a potential divider on the Arduino output pin, providing the correct voltages to set the frequency shift.  
-
-**Usage as follows**: call this line before setup():  
-`RTTY rtty(radio_txd_pin, baud_rate, stop_bits, CHECKSUM_CRC16)`  
-
-Then call the `transmit()` function with the string you wish to send, forex:  
-`rtty.transmit("This is my string\r\n")`  
-
-**Library Functions**:  
-Transmit a string:  
-`transmit(string);`  
-
-Set the transmission baud rate:  
-`setBaud(50);`  
-
-Get the current baud rate setting:  
-`getBaud();`  
-
-Set the checksum type to be appended to the transmitted string:  
-`setChecksum(CHECKSUM_CRC16);`  
-
-Get the current checksum setting:  
-`getChecksum();`  
-
 Please see the schematic in the `ferrettwo/` directory for details of how the hardware needs to be set up to make use of librtty.  
 
 By [Adam Greig](http://github.com/adamgreig) and [Jon Sowman](http://github.com/jonsowman) for [CU Spaceflight](http://www.cuspaceflight.co.uk) - 2010.  
